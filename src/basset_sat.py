@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+
 from optparse import OptionParser
 import copy, os, pdb, random, subprocess, sys
 
@@ -92,7 +92,7 @@ def main():
 
         # sample
         if options.sample:
-            sample_i = np.array(random.sample(xrange(seqs_1hot.shape[0]), options.sample))
+            sample_i = np.array(random.sample(range(seqs_1hot.shape[0]), options.sample))
             seqs_1hot = seqs_1hot[sample_i]
             seq_headers = seq_headers[sample_i]
             seqs = seqs[sample_i]
@@ -127,7 +127,7 @@ def main():
 
             # sample
             if options.sample:
-                sample_i = np.array(random.sample(xrange(seqs_1hot.shape[0]), options.sample))
+                sample_i = np.array(random.sample(range(seqs_1hot.shape[0]), options.sample))
                 seqs_1hot = seqs_1hot[sample_i]
                 seq_headers = seq_headers[sample_i]
                 targets = targets[sample_i]
@@ -180,7 +180,7 @@ def main():
 
     # decide which cells to plot
     if options.targets == '-1':
-        plot_targets = xrange(seq_mod_preds.shape[3])
+        plot_targets = range(seq_mod_preds.shape[3])
     else:
         plot_targets = [int(ci) for ci in options.targets.split(',')]
 
@@ -279,7 +279,7 @@ def main():
         #################################################################
         print_targets = plot_targets
         if options.print_table_all:
-            print_targets = range(seq_mod_preds.shape[3])
+            print_targets = list(range(seq_mod_preds.shape[3]))
 
         for ci in print_targets:
             seq_mod_preds_cell = seq_mod_preds[si,:,:,ci]

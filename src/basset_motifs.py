@@ -70,7 +70,7 @@ def main():
     #################################################################
     if options.sample is not None:
         # choose sampled indexes
-        sample_i = np.array(random.sample(xrange(seq_vecs.shape[0]), options.sample))
+        sample_i = np.array(random.sample(range(seq_vecs.shape[0]), options.sample))
 
         # filter
         seq_vecs = seq_vecs[sample_i]
@@ -95,7 +95,7 @@ def main():
     if options.model_hdf5_file is None:
         options.model_hdf5_file = '%s/model_out.h5' % options.out_dir
         torch_cmd = 'basset_motifs_predict.lua %s %s %s' % (model_file, test_hdf5_file, options.model_hdf5_file)
-        print torch_cmd
+        print(torch_cmd)
         subprocess.call(torch_cmd, shell=True)
 
     # load model output
@@ -117,7 +117,7 @@ def main():
     meme_out = meme_intro('%s/filters_meme.txt'%options.out_dir, seqs)
 
     for f in range(num_filters):
-        print 'Filter %d' % f
+        print('Filter %d' % f)
 
         # plot filter parameters as a heatmap
         plot_filter_heat(filter_weights[f,:,:], '%s/filter%d_heat.pdf' % (options.out_dir,f))
@@ -161,7 +161,7 @@ def main():
 
     # print header for later panda reading
     header_cols = ('', 'consensus', 'annotation', 'ic', 'mean', 'std')
-    print >> table_out, '%3s  %19s  %10s  %5s  %6s  %6s' % header_cols
+    print('%3s  %19s  %10s  %5s  %6s  %6s' % header_cols, file=table_out)
 
     for f in range(num_filters):
         # collapse to a consensus motif
@@ -177,7 +177,7 @@ def main():
         fmean, fstd = plot_score_density(np.ravel(filter_outs[:,f,:]), '%s/filter%d_dens.pdf' % (options.out_dir,f))
 
         row_cols = (f, consensus, annotation, filters_ic[f], fmean, fstd)
-        print >> table_out, '%-3d  %19s  %10s  %5.2f  %6.4f  %6.4f' % row_cols
+        print('%-3d  %19s  %10s  %5.2f  %6.4f  %6.4f' % row_cols, file=table_out)
 
     table_out.close()
 
@@ -290,12 +290,12 @@ def meme_add(meme_out, f, filter_pwm, nsites, trim_filters=False):
             ic_end -= 1
 
     if ic_start < ic_end:
-        print >> meme_out, 'MOTIF filter%d' % f
-        print >> meme_out, 'letter-probability matrix: alength= 4 w= %d nsites= %d' % (ic_end-ic_start+1, nsites)
+        print('MOTIF filter%d' % f, file=meme_out)
+        print('letter-probability matrix: alength= 4 w= %d nsites= %d' % (ic_end-ic_start+1, nsites), file=meme_out)
 
         for i in range(ic_start, ic_end+1):
-            print >> meme_out, '%.4f %.4f %.4f %.4f' % tuple(filter_pwm[i])
-        print >> meme_out, ''
+            print('%.4f %.4f %.4f %.4f' % tuple(filter_pwm[i]), file=meme_out)
+        print('', file=meme_out)
 
 
 def meme_intro(meme_file, seqs):
@@ -327,13 +327,13 @@ def meme_intro(meme_file, seqs):
     meme_out = open(meme_file, 'w')
 
     # print intro material
-    print >> meme_out, 'MEME version 4'
-    print >> meme_out, ''
-    print >> meme_out, 'ALPHABET= ACGT'
-    print >> meme_out, ''
-    print >> meme_out, 'Background letter frequencies:'
-    print >> meme_out, 'A %.4f C %.4f G %.4f T %.4f' % tuple(nt_freqs)
-    print >> meme_out, ''
+    print('MEME version 4', file=meme_out)
+    print('', file=meme_out)
+    print('ALPHABET= ACGT', file=meme_out)
+    print('', file=meme_out)
+    print('Background letter frequencies:', file=meme_out)
+    print('A %.4f C %.4f G %.4f T %.4f' % tuple(nt_freqs), file=meme_out)
+    print('', file=meme_out)
 
     return meme_out
 
@@ -480,7 +480,7 @@ def plot_filter_seg_heat(filter_outs, out_pdf, whiten=True, drop_dead=True):
     s = 5
     while l/float(s) - (l/s) > 0:
         s += 1
-    print '%d segments of length %d' % (s,l/s)
+    print('%d segments of length %d' % (s,l/s))
 
     # split into multiple segments
     filter_outs_seg = np.reshape(filter_outs, (b, f, s, l/s))
@@ -574,15 +574,15 @@ def filter_possum(param_matrix, motif_id, possum_file, trim_filters=False, mult=
 
     if trim_start < trim_end:
         possum_out = open(possum_file, 'w')
-        print >> possum_out, 'BEGIN GROUP'
-        print >> possum_out, 'BEGIN FLOAT'
-        print >> possum_out, 'ID %s' % motif_id
-        print >> possum_out, 'AP DNA'
-        print >> possum_out, 'LE %d' % (trim_end+1-trim_start)
+        print('BEGIN GROUP', file=possum_out)
+        print('BEGIN FLOAT', file=possum_out)
+        print('ID %s' % motif_id, file=possum_out)
+        print('AP DNA', file=possum_out)
+        print('LE %d' % (trim_end+1-trim_start), file=possum_out)
         for ci in range(trim_start,trim_end+1):
-            print >> possum_out, 'MA %s' % ' '.join(['%.2f'%(mult*n) for n in param_matrix[:,ci]])
-        print >> possum_out, 'END'
-        print >> possum_out, 'END'
+            print('MA %s' % ' '.join(['%.2f'%(mult*n) for n in param_matrix[:,ci]]), file=possum_out)
+        print('END', file=possum_out)
+        print('END', file=possum_out)
 
         possum_out.close()
 
@@ -603,7 +603,7 @@ def plot_filter_heat(param_matrix, out_pdf):
     plt.figure(figsize=(param_matrix.shape[1], 4))
     sns.heatmap(param_matrix, cmap='PRGn', linewidths=0.2, vmin=-param_range, vmax=param_range)
     ax = plt.gca()
-    ax.set_xticklabels(range(1,param_matrix.shape[1]+1))
+    ax.set_xticklabels(list(range(1,param_matrix.shape[1]+1)))
     ax.set_yticklabels('TGCA', rotation='horizontal') # , size=10)
     plt.savefig(out_pdf)
     plt.close()
@@ -632,8 +632,8 @@ def plot_filter_logo(filter_outs, filter_size, seqs, out_prefix, raw_t=0, maxpct
         for j in range(filter_outs.shape[1]):
             if filter_outs[i,j] > raw_t:
                 kmer = seqs[i][j:j+filter_size]
-                print >> filter_fasta_out, '>%d_%d' % (i,j)
-                print >> filter_fasta_out, kmer
+                print('>%d_%d' % (i,j), file=filter_fasta_out)
+                print(kmer, file=filter_fasta_out)
                 filter_count += 1
     filter_fasta_out.close()
 

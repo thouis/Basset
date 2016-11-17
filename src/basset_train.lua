@@ -126,7 +126,6 @@ else
         os.exit()
     end
 end
-
 convnet.model:training()
 
 ----------------------------------------------------------------
@@ -139,6 +138,9 @@ local train_loss_last
 local valid_loss
 local valid_acc
 local batcher = Batcher:__init(train_seqs, train_targets, convnet.batch_size)
+
+print(tostring(convnet.model.criterion))
+print("bar")
 
 while epoch <= opt.max_epochs and epoch - epoch_best <= opt.stagnant_t do
     io.write(string.format("Epoch #%3d   ", epoch))

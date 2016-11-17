@@ -95,7 +95,7 @@ def main():
 
     # decide which cells to plot
     if options.targets == '-1':
-        plot_cells = xrange(seq_mod_preds.shape[3])
+        plot_cells = range(seq_mod_preds.shape[3])
     else:
         plot_cells = [int(ci) for ci in options.targets.split(',')]
 
@@ -183,7 +183,7 @@ def main():
 
             for pos in range(seq_mod_preds_cell.shape[1]):
                 cols = [header, delta_start+pos, ci, loss_matrix[pos], gain_matrix[pos]]
-                print >> table_out, '\t'.join([str(c) for c in cols])
+                print('\t'.join([str(c) for c in cols]), file=table_out)
 
     table_out.close()
 

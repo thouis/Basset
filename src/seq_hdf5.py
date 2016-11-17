@@ -55,11 +55,11 @@ def main():
     headers = []
     for line in open(fasta_file):
         if line[0] == '>':
-            headers.append(line[1:].rstrip())
+            headers.append(line[1:].rstrip().encode('ascii', 'ignore'))
     headers = np.array(headers)
 
     # read labels
-    target_labels = open(targets_file).readline().strip().split('\t')
+    target_labels = [s.encode('ascii', 'ignore') for s in open(targets_file).readline().strip().split('\t')]
 
     # read additional features
     if options.add_features_file:
@@ -93,13 +93,13 @@ def main():
 
     train_count = seqs.shape[0] - test_count - valid_count
     train_count = batch_round(train_count, options.batch_size)
-    print >> sys.stderr, '%d training sequences ' % train_count
+    print(( '%d training sequences ' % train_count))
 
     test_count = batch_round(test_count, options.batch_size)
-    print >> sys.stderr, '%d test sequences ' % test_count
+    print(( '%d test sequences ' % test_count))
 
     valid_count = batch_round(valid_count, options.batch_size)
-    print >> sys.stderr, '%d validation sequences ' % valid_count
+    print(( '%d validation sequences ' % valid_count))
 
     i = 0
     train_seqs, train_targets = seqs[i:i+train_count,:], targets[i:i+train_count,:]

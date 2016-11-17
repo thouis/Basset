@@ -57,14 +57,14 @@ def main():
     target_beds = []
     target_dbi = []
     for line in open(target_beds_file):
-    	a = line.split()
+        a = line.split()
         if len(a) != 2:
-            print a
-            print >> sys.stderr, 'Each row of the target BEDS file must contain a label and BED file separated by whitespace'
+            print (a)
+            print ('Each row of the target BEDS file must contain a label and BED file separated by whitespace')
             exit(1)
-    	target_dbi.append(len(db_targets))
-    	db_targets.append(a[0])
-    	target_beds.append(a[1])
+        target_dbi.append(len(db_targets))
+        db_targets.append(a[0])
+        target_beds.append(a[1])
 
     # read in chromosome lengths
     chrom_lengths = {}
@@ -74,7 +74,7 @@ def main():
             a = line.split()
             chrom_lengths[a[0]] = int(a[1])
     else:
-        print >> sys.stderr, 'Warning: chromosome lengths not provided, so regions near ends may be incorrect.'
+        print ('Warning: chromosome lengths not provided, so regions near ends may be incorrect.', file=sys.stderr)
 
     #################################################################
     # print peaks to chromosome-specific files
@@ -88,9 +88,9 @@ def main():
 
     for bi in range(len(peak_beds)):
         if peak_beds[bi][-3:] == '.gz':
-            peak_bed_in = gzip.open(peak_beds[bi])
+            peak_bed_in = gzip.open(peak_beds[bi], encoding='ascii', mode='rt')
         else:
-            peak_bed_in = open(peak_beds[bi])
+            peak_bed_in = open(peak_beds[bi], encoding='ascii')
 
         for line in peak_bed_in:
             a = line.split('\t')
@@ -120,9 +120,9 @@ def main():
                 if options.no_db_activity:
                     # set activity to null
                     a[6] = '.'
-                    print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                    print('\t'.join(a[:7]), file=chrom_outs[chrom_key])
                 else:
-                    print >> chrom_outs[chrom_key], line,
+                    print(line, file=chrom_outs[chrom_key])
 
             # if it's a new bed
             else:
@@ -131,7 +131,7 @@ def main():
                     a.append('')
                 a[5] = strand
                 a[6] = str(target_dbi[bi])
-                print >> chrom_outs[chrom_key], '\t'.join(a[:7])
+                print('\t'.join(a[:7]), file=chrom_outs[chrom_key])
 
         peak_bed_in.close()
 
@@ -144,7 +144,7 @@ def main():
         for orient in '+-':
             chrom_key = ('chrY',orient)
             if chrom_key in chrom_files:
-                print >> sys.stderr, 'Ignoring chrY %s' % orient
+                print ('Ignoring chrY %s' % orient)
                 os.remove(chrom_files[chrom_key])
                 del chrom_files[chrom_key]
 
@@ -155,7 +155,7 @@ def main():
             chrom,strand = chrom_key
             primary_m = primary_re.match(chrom)
             if not primary_m and chrom != 'chrX':
-                print >> sys.stderr, 'Ignoring %s %s' % (chrom,strand)
+                print ('Ignoring %s %s' % (chrom,strand))
                 os.remove(chrom_files[chrom_key])
                 del chrom_files[chrom_key]
 
@@ -167,10 +167,11 @@ def main():
         chrom,strand = chrom_key
         chrom_sbed = '%s_%s_%s_sort.bed' % (options.out_prefix,chrom,strand)
         sort_cmd = 'sortBed -i %s > %s' % (chrom_files[chrom_key], chrom_sbed)
+        print(sort_cmd)
         subprocess.call(sort_cmd, shell=True)
+        print("don")
         os.remove(chrom_files[chrom_key])
         chrom_files[chrom_key] = chrom_sbed
-
 
     #################################################################
     # parse chromosome-specific files
@@ -207,7 +208,7 @@ def main():
 
                     # print to file
                     for mpeak in mpeaks:
-                        print >> final_bed_out, mpeak.bed_str(chrom, strand)
+                        print(mpeak.bed_str(chrom, strand), file=final_bed_out)
 
                     # initialize open peak
                     open_end = peak.end
@@ -224,7 +225,7 @@ def main():
 
             # print to file
             for mpeak in mpeaks:
-                print >> final_bed_out, mpeak.bed_str(chrom, strand)
+                print(mpeak.bed_str(chrom, strand), file=final_bed_out)
 
     final_bed_out.close()
 
@@ -240,7 +241,7 @@ def main():
 
     # print header
     cols = [''] + db_targets
-    print >> final_act_out, '\t'.join(cols)
+    print('\t'.join(cols), file=final_act_out)
 
     # print sequences
     for line in open('%s.bed' % options.out_prefix):
@@ -256,7 +257,7 @@ def main():
 
         # print line
         cols = [peak_id] + peak_act
-        print >> final_act_out, '\t'.join([str(c) for c in cols])
+        print ('\t'.join([str(c) for c in cols]), file=final_act_out)
 
     final_act_out.close()
 
@@ -285,7 +286,7 @@ def activity_set(act_cs):
 
 def find_midpoint(start, end):
     ''' Find the midpoint coordinate between start and end '''
-    mid = (start + end)/2
+    mid = (start + end)//2
     return mid
 
 
@@ -350,7 +351,7 @@ def merge_peaks_dist(peaks, peak_size, chrom_len):
     merge_mid = int(0.5+np.average(peak_mids, weights=peak_weights))
 
     # extend to the full size
-    merge_start = max(0, merge_mid - peak_size/2)
+    merge_start = max(0, merge_mid - peak_size//2)
     merge_end = merge_start + peak_size
     if chrom_len and merge_end > chrom_len:
         merge_end = chrom_len
@@ -385,7 +386,7 @@ class Peak:
             chrom_len (int) : chromosome length to cap the peak at
         '''
         mid = find_midpoint(self.start, self.end)
-        self.start = max(0, mid - ext_len/2)
+        self.start = max(0, mid - ext_len//2)
         self.end = self.start + ext_len
         if chrom_len and self.end > chrom_len:
             self.end = chrom_len
@@ -425,7 +426,7 @@ class Peak:
         merge_mid = int(0.5+np.average(peak_mids, weights=peak_weights))
 
         # extend to the full size
-        merge_start = max(0, merge_mid - ext_len/2)
+        merge_start = max(0, merge_mid - ext_len//2)
         merge_end = merge_start + ext_len
         if chrom_len and merge_end > chrom_len:
             merge_end = chrom_len

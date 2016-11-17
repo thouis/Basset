@@ -55,7 +55,7 @@ def main():
     # print
     bed_out = open('%s.bed' % out_pre, 'w')
     for r in range(len(reservoir)):
-        print >> bed_out, reservoir[r],
+        print(reservoir[r], end=' ', file=bed_out)
 
     bed_out.close()
 
@@ -80,13 +80,13 @@ def main():
         act_in = open(act_file)
 
     # print header
-    print >> act_out, act_in.readline(),
+    print(act_in.readline(), end=' ', file=act_out)
 
     # filter activity table
     for line in act_in:
         a = line.split('\t')
         if a[0] in reservoir_headers:
-            print >> act_out, line,
+            print(line, end=' ', file=act_out)
 
     act_in.close()
     act_out.close()

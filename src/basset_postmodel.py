@@ -98,7 +98,7 @@ def main():
 
     # sample
     if options.sample is not None and options.sample < train_x.shape[0]:
-        sample_indexes = random.sample(range(train_x.shape[0]), options.sample)
+        sample_indexes = random.sample(list(range(train_x.shape[0])), options.sample)
         train_x = train_x[sample_indexes]
         train_y = train_y[sample_indexes]
 
@@ -113,7 +113,7 @@ def main():
 
         # accuracy
         acc_out = open('%s/r2.txt' % options.out_dir, 'w')
-        print >> acc_out, model.score(test_x, test_y)
+        print(model.score(test_x, test_y), file=acc_out)
         acc_out.close()
 
         test_preds = model.predict(test_x)
@@ -138,7 +138,7 @@ def main():
         # accuracy
         test_preds = model.predict_proba(test_x)[:,1].flatten()
         acc_out = open('%s/auc.txt' % options.out_dir, 'w')
-        print >> acc_out, roc_auc_score(test_y, test_preds)
+        print(roc_auc_score(test_y, test_preds), file=acc_out)
         acc_out.close()
 
         # compute and print ROC curve
@@ -146,7 +146,7 @@ def main():
 
         roc_out = open('%s/roc.txt' % options.out_dir, 'w')
         for i in range(len(fpr)):
-            print >> roc_out, '%f\t%f\t%f' % (fpr[i], tpr[i], thresholds[i])
+            print('%f\t%f\t%f' % (fpr[i], tpr[i], thresholds[i]), file=roc_out)
         roc_out.close()
 
         # compute and print precision-recall curve
@@ -154,7 +154,7 @@ def main():
 
         prc_out = open('%s/prc.txt' % options.out_dir, 'w')
         for i in range(len(precision)):
-            print >> prc_out, '%f\t%f' % (precision[i], recall[i])
+            print('%f\t%f' % (precision[i], recall[i]), file=prc_out)
         prc_out.close()
 
     # save model
@@ -170,7 +170,7 @@ def main():
             coefi = model.coef_[add_i+ai]
         else:
             coefi = model.coef_[0,add_i+ai]
-        print >> coef_out, add_labels[ai], coefi
+        print(add_labels[ai], coefi, file=coef_out)
     coef_out.close()
 
 
@@ -180,7 +180,7 @@ def balance(x,y):
     positives = np.array([i for i in range(y.shape[0]) if y[i] == 1])
     negatives = np.array([i for i in range(y.shape[0]) if y[i] == 0])
 
-    print '%d positives to %d negatives' % (len(positives), len(negatives))
+    print('%d positives to %d negatives' % (len(positives), len(negatives)))
 
     if len(negatives) < len(positives):
         xb = x

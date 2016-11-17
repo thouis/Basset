@@ -83,7 +83,7 @@ def main():
     #################################################################
     if options.sample is not None:
         # choose sampled indexes
-        sample_i = np.array(random.sample(xrange(seq_vecs.shape[0]), options.sample))
+        sample_i = np.array(random.sample(range(seq_vecs.shape[0]), options.sample))
 
         # filter
         seq_vecs = seq_vecs[sample_i]
@@ -139,7 +139,7 @@ def main():
         tnorm_out = open('%s/loss_target.txt' % options.out_dir, 'w')
         for fi in range(len(filter_infl)):
             cols = (fi, filter_infl_loss[fi], filter_infl[fi])
-            print >> tnorm_out, '%3d  %7.4f  %7.4f' % cols
+            print('%3d  %7.4f  %7.4f' % cols, file=tnorm_out)
         tnorm_out.close()
 
         # compare the two
@@ -153,11 +153,11 @@ def main():
         ax.set_xlim(xmin, xmax)
         ax.set_xlabel('loss-based influence')
         ax.xaxis.label.set_fontsize(18)
-        map(lambda xl: xl.set_fontsize(15), ax.get_xticklabels())
+        list(map(lambda xl: xl.set_fontsize(15), ax.get_xticklabels()))
         ax.set_ylim(ymin, ymax)
         ax.set_ylabel('target-based influence')
         ax.yaxis.label.set_fontsize(18)
-        map(lambda yl: yl.set_fontsize(15), ax.get_yticklabels())
+        list(map(lambda yl: yl.set_fontsize(15), ax.get_yticklabels()))
         ax.grid(True, linestyle=':')
         plt.tight_layout(w_pad=0, h_pad=0)
         plt.savefig('%s/loss_target.pdf' % options.out_dir)
@@ -171,10 +171,10 @@ def main():
     for i in range(len(filter_infl)):
         if df_motifs is not None:
             cols = (i, filter_infl[i], filter_means[i], filter_stds[i], df_motifs.ic.iloc[i], df_motifs.annotation.iloc[i])
-            print >> table_out, '%3d  %7.4f  %6.4f  %6.3f  %4.1f  %8s' % cols
+            print('%3d  %7.4f  %6.4f  %6.3f  %4.1f  %8s' % cols, file=table_out)
         else:
             cols = (i, filter_infl[i], filter_means[i], filter_stds[i])
-            print >> table_out, '%3d  %7.4f  %6.4f  %6.3f' % cols
+            print('%3d  %7.4f  %6.4f  %6.3f' % cols, file=table_out)
     table_out.close()
 
 
@@ -204,11 +204,11 @@ def main():
         ax.set_xlim(xmin, xmax)
         ax.set_xlabel('Information content')
         ax.xaxis.label.set_fontsize(18)
-        map(lambda xl: xl.set_fontsize(15), ax.get_xticklabels())
+        list(map(lambda xl: xl.set_fontsize(15), ax.get_xticklabels()))
         ax.set_ylim(ymin, ymax)
         ax.set_ylabel('Influence')
         ax.yaxis.label.set_fontsize(18)
-        map(lambda yl: yl.set_fontsize(15), ax.get_yticklabels())
+        list(map(lambda yl: yl.set_fontsize(15), ax.get_yticklabels()))
 
         # ax.grid(True, linestyle=':')
         plt.tight_layout(w_pad=0, h_pad=0)
@@ -229,7 +229,7 @@ def main():
     for i in range(df_ft.shape[0]):
         for ti in range(len(target_names)):
             cols = (i, ti, target_names[ti], df_ft.iloc[i,ti])
-            print >> table_out, '%-3d  %3d  %20s  %7.4f' % cols
+            print('%-3d  %3d  %20s  %7.4f' % cols, file=table_out)
     table_out.close()
 
     # print sequence-specific filter influence per target table
@@ -239,7 +239,7 @@ def main():
             for fi in range(seq_filter_targets.shape[1]):
                 for ti in range(seq_filter_targets.shape[2]):
                     cols = (seq_headers[si], fi, ti, seq_filter_targets[si][fi][ti])
-                    print >> table_out, '%-25s  %3d  %3d  %7.4f' % cols
+                    print('%-25s  %3d  %3d  %7.4f' % cols, file=table_out)
         table_out.close()
 
     # use only high information filters

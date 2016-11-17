@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+
 import sys
 from collections import OrderedDict
 
@@ -30,7 +30,7 @@ def align_seqs_scores_1hot(seq_vecs, seq_scores, sort=True):
     if sort:
         seq_headers = sorted(seq_vecs.keys())
     else:
-        seq_headers = seq_vecs.keys()
+        seq_headers = list(seq_vecs.keys())
 
     # construct lists of vectors
     train_scores = []
@@ -331,7 +331,7 @@ def load_sequences(fasta_file, permute=False):
     seq_vecs = hash_sequences_1hot(fasta_file)
 
     # stack
-    train_seqs = np.vstack(seq_vecs.values())
+    train_seqs = np.vstack(list(seq_vecs.values()))
 
     # randomly permute the data
     if permute:

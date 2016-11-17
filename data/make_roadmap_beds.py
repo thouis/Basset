@@ -27,7 +27,7 @@ def main():
 
     	peaks_bed = 'roadmap/%s-DNase.hotspot.fdr0.01.peaks.bed.gz' % eid
     	if os.path.isfile(peaks_bed):
-    		print >> beds_out, df.iloc[i,5], '\t', peaks_bed
+    		print(df.iloc[i,5]+ '\t'+ peaks_bed, file=beds_out)
 
     beds_out.close()
 

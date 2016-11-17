@@ -74,7 +74,7 @@ def main():
         opts_str += ' -scores'
 
     torch_cmd = 'basset_predict.lua %s %s %s %s' % (opts_str, model_file, model_input_hdf5, out_file)
-    print torch_cmd
+    print(torch_cmd)
     subprocess.call(torch_cmd, shell=True)
 
     if temp_hdf5:

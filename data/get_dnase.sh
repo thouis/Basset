@@ -16,7 +16,7 @@ wget -r -A "*DNase.hotspot.fdr0.01.peaks.bed.gz" http://egg2.wustl.edu/roadmap/d
 # rearrange
 mv egg2.wustl.edu/roadmap/data/byFileType/peaks/consolidated/narrowPeak roadmap
 rm -r egg2.wustl.edu
-rmdir roadmap/hammock
+rm -r roadmap/hammock
 
 # make sample-BED table
 ./make_roadmap_beds.py

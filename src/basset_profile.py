@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+
 from optparse import OptionParser
 import os
 from sklearn.metrics import log_loss

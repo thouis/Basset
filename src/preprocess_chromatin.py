@@ -71,7 +71,7 @@ def main():
 
     # label features
     feature_labels = []
-    for target in target_wigs.keys():
+    for target in list(target_wigs.keys()):
         if num_bins == 1:
             feature_labels.append(target)
         else:
@@ -89,7 +89,7 @@ def main():
     wi = 0
     for sample in target_wigs:
         wig_file = target_wigs[sample]
-        print wig_file
+        print(wig_file)
 
         # open wig
         wig_in = pyBigWig.open(wig_file)
@@ -143,14 +143,14 @@ def main():
     sv_out = open(out_file, 'w')
 
     cols = [''] + feature_labels
-    print >> sv_out, '\t'.join(cols)
+    print('\t'.join(cols), file=sv_out)
 
     si = 0
     for line in open(sites_bed_file):
         a = line.split()
         site_id = '%s:%s-%s(%s)' % (a[0], a[1], a[2], a[5])
         cols = [site_id] + [str(v) for v in site_features[si]]
-        print >> sv_out, '\t'.join(cols)
+        print('\t'.join(cols), file=sv_out)
         si += 1
 
     sv_out.close()

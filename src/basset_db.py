@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+
 from optparse import OptionParser
 from collections import OrderedDict
 import os
@@ -67,7 +67,7 @@ def main():
     #################################################################
     if options.sample is not None:
         # choose sampled indexes
-        sample_i = np.array(random.sample(xrange(seq_vecs.shape[0]), options.sample))
+        sample_i = np.array(random.sample(range(seq_vecs.shape[0]), options.sample))
 
         # filter
         seq_vecs = seq_vecs[sample_i]
@@ -148,7 +148,7 @@ def main():
     #################################################################
     # score diffs
     #################################################################
-    motif_scores_df = pd.DataFrame(scores_diffs, index=db_motifs.keys(), columns=target_labels)
+    motif_scores_df = pd.DataFrame(scores_diffs, index=list(db_motifs.keys()), columns=target_labels)
 
     # plot heat map
     plt.figure()
@@ -181,7 +181,7 @@ def main():
     # filter diffs
     #################################################################
     for l in range(1):
-        motif_filters_df = pd.DataFrame(reprs_diffs[l], index=db_motifs.keys())
+        motif_filters_df = pd.DataFrame(reprs_diffs[l], index=list(db_motifs.keys()))
 
         # plot heat map
         plt.figure()

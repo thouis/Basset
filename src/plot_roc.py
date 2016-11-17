@@ -99,8 +99,8 @@ def main():
     ax.xaxis.label.set_fontsize(17)
     ax.yaxis.label.set_fontsize(17)
 
-    map(lambda xl: xl.set_fontsize(13), ax.get_xticklabels())
-    map(lambda yl: yl.set_fontsize(13), ax.get_yticklabels())
+    list(map(lambda xl: xl.set_fontsize(13), ax.get_xticklabels()))
+    list(map(lambda yl: yl.set_fontsize(13), ax.get_yticklabels()))
 
     ax.grid(True, linestyle=':')
     plt.tight_layout()
