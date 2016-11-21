@@ -94,10 +94,9 @@ def main():
     #################################################################
     if options.model_hdf5_file is None:
         options.model_hdf5_file = '%s/model_out.h5' % options.out_dir
-        predict_cmd = 'python find_motifs.py model.json %s %s %s' % (model_file, test_hdf5_file, options.model_hdf5_file)
-        #torch_cmd = 'basset_motifs_predict.lua %s %s %s' % (model_file, test_hdf5_file, options.model_hdf5_file)
-        print(predict_cmd)
-        subprocess.call(predict_cmd, shell=True)
+        torch_cmd = 'basset_motifs_predict.lua %s %s %s' % (model_file, test_hdf5_file, options.model_hdf5_file)
+        print(torch_cmd)
+        subprocess.call(torch_cmd, shell=True)
 
     # load model output
     model_hdf5_in = h5py.File(options.model_hdf5_file, 'r')
@@ -108,8 +107,6 @@ def main():
     # store useful variables
     num_filters = filter_weights.shape[0]
     filter_size = filter_weights.shape[2]
-    assert num_filters == 300
-    assert filter_size == 19
 
 
     #################################################################
