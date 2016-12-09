@@ -7,3 +7,5 @@
 *.txt
 src/__pycache__
 src/torch-hdf5
+*~
+*.fai
