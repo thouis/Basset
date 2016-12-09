@@ -17,6 +17,7 @@ import keras.backend as K
 import theano
 
 from Eve import Eve
+from prg import prg
 
 
 def maybe_print(tensor, msg, do_print=True):
@@ -45,6 +46,22 @@ def hinge_loss(y_true, y_pred):
     unweighted_loss = K.clip(0.5 - diffs, 0, 2)
     L = K.sum(unweighted_loss * pos_minus_neg) / K.sum(pos_minus_neg)
     return L
+
+
+def AUC_loss(y_true, y_pred):
+    y_false = 1 - y_true
+    mean_true = K.sum(y_true * y_pred) / K.sum(y_true)
+    mean_false = K.sum(y_false * y_pred) / K.sum(y_false)
+    return 1 - mean_true * (1 - mean_false)
+
+def AUC_weighted_loss(y_true, y_pred):
+    y_true = K.cast(y_true, 'float32')
+    y_false = 1 - y_true
+    w_true = y_true * (1 - y_pred + 0.1)
+    mean_true = K.sum(w_true * y_pred) / K.sum(w_true)
+    w_false = y_false * (y_pred + 0.1)
+    mean_false = K.sum(w_false * y_pred) / K.sum(w_false)
+    return 1 - mean_true * (1 - mean_false)
 
 
 def basset_network(input_shape, outputs, act_w=0.1):
@@ -76,9 +93,7 @@ def basset_network(input_shape, outputs, act_w=0.1):
         if input_shape is not None:
             model.add(Convolution1D(cd, cw, input_shape=input_shape))
         else:
-            # sparse activations on higher levels
-            regularizer = activity_l1(float(act_w) / np.prod(model.layers[-1].output_shape[1:]))
-            model.add(Convolution1D(cd, cw, activity_regularizer=regularizer))
+            model.add(Convolution1D(cd, cw))
         model.add(BatchNormalization(axis=2))
         model.add(Activation('relu'))
         model.add(MaxPooling1D(pw))
@@ -101,9 +116,10 @@ def basset_network(input_shape, outputs, act_w=0.1):
 
 
 class CB(Callback):
-    def __init__(self, m, valid_gen):
+    def __init__(self, m, valid_gen, start_epoch=0):
         self.m = m
         self.valid_gen = valid_gen
+        self.start_epoch = start_epoch
 
     def on_epoch_end(self, epoch, logs):
         ground_truth = []
@@ -128,14 +144,20 @@ class CB(Callback):
               format(precision, recall, TP, FP, FN))
 
         AUC = roc_auc_score(ground_truth, predictions, average='macro')
-        PRC = average_precision_score(ground_truth, predictions, average='macro')
+        assert ground_truth.shape[1] == 164
+        assert len(ground_truth.shape) == 2
+        sum_prg = 0.0
+        for idx in range(ground_truth.shape[1]):
+            prg_curve = prg.create_prg_curve(ground_truth[:, idx], predictions[:, idx])
+            sum_prg += prg.calc_auprg(prg_curve)
+        PRC = sum_prg / ground_truth.shape[1]
         print("     AUC {}   PRC {}".format(AUC, PRC))
         print("")
-        self.m.save_weights("weights_{}.h5".format(epoch))
+        self.m.save_weights("weights_{}.h5".format(epoch + self.start_epoch))
 
 
 if __name__ == '__main__':
-    batch_size = 32
+    batch_size = 64
     epoch_size, train_gen, valid_gen = datagen.generate_data(sys.argv[1], batch_size)
     i, o = next(train_gen)
 
@@ -147,11 +169,11 @@ if __name__ == '__main__':
 
     print("compiling")
     # model.compile(loss=weighted_mse, optimizer=SGD(lr=1e-3, momentum=0.95, clipvalue=0.5))
-    # opt = Eve(lr=1E-4, decay=1E-4, beta_1=0.9, beta_2=0.999, beta_3=0.999, small_k=0.1, big_K=10, epsilon=1e-08)
-    opt = SGD(lr=0.0001, momentum=0.9)
+    opt = Eve(lr=1E-4, decay=1E-4, beta_1=0.9, beta_2=0.999, beta_3=0.999, small_k=0.1, big_K=10, epsilon=1e-08)
+    # opt = SGD(lr=0.0001, momentum=0.95)
     # opt = RMSprop(lr=0.02)
-    model.compile(loss=hinge_loss, optimizer=opt)
-    model.load_weights('weights_0.h5')
+    model.compile(loss=AUC_weighted_loss, optimizer=opt)
+#    model.load_weights('weights_43.h5')
 
     print("fitting")
-    model.fit_generator(train_gen, (epoch_size // batch_size) * batch_size, 100, verbose=1, callbacks=[CB(model, valid_gen)])
+    model.fit_generator(train_gen, (epoch_size // batch_size) * batch_size, 100, verbose=1, callbacks=[CB(model, valid_gen, start_epoch=0)])
